@@ -2,13 +2,11 @@
 
 #include <type_traits>
 
-#include <boost/any.hpp>
-
 namespace duk {
 
 class BoxBase {
 public:
-    virtual ~BoxBase() {};
+    virtual ~BoxBase() = 0;
 
     template <class T>
     T & as() {
@@ -23,26 +21,18 @@ public:
     }
 };
 
+inline BoxBase::~BoxBase() {};
+
 template <class T>
 class Box: public BoxBase {
 public:
-    Box(T value): _value(std::move(value)) {}
+    explicit Box(T value): _value(std::move(value)) {}
 
     T const & value() const { return _value; }
     T & value() { return _value; }
 
 private:
     T _value;
-};
-
-class AnyBox: public BoxBase {
-public:
-    AnyBox(boost::any const &value): _value(value) {}
-
-    boost::any const & value() const { return _value; }
-
-private:
-    boost::any _value;
 };
 
 }
