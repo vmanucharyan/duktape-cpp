@@ -10,7 +10,7 @@
 
 #include "PushObjectInspector.h"
 
-namespace engine { namespace duk { namespace details {
+namespace duk { namespace details {
 
 // Shared ptr constructor
 
@@ -117,4 +117,4 @@ inline duk_ret_t ConstructorUnique<C, A...>::func(duk_context *d) {
    return dispatcher.dispatch(f, *ctx);
 }
 
-}}}
+}}

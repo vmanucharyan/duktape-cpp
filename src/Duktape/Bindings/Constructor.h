@@ -2,7 +2,7 @@
 
 #include <duktape.h>
 
-namespace engine { namespace duk {
+namespace duk {
 
 class Context;
 
@@ -15,7 +15,7 @@ namespace details {
  */
 template <class C, class ... A>
 struct Constructor {
-    typedef std::unique_ptr<C> (*TFunc)(A...);
+    typedef std::shared_ptr<C> (*TFunc)(A...);
 
     /**
      * Push constructor to stack
@@ -38,7 +38,7 @@ struct Constructor {
  */
 template <class C, class ... A>
 struct ConstructorUnique {
-    typedef up<C> (*TFunc)(A...);
+    typedef std::unique_ptr<C> (*TFunc)(A...);
 
     /**
      * Push constructor to stack
@@ -56,4 +56,4 @@ struct ConstructorUnique {
 
 } // details
 
-}} // engine::duk
+} // engine::duk

@@ -14,7 +14,7 @@
 #include "../Context.h"
 
 
-namespace engine { namespace duk {
+namespace duk {
 
 namespace details {
 
@@ -39,7 +39,7 @@ struct MakeUptrBox {
 template <class T>
 struct MakeUptrBox<T, true> {
     static std::unique_ptr<BoxBase> make(std::unique_ptr<T> value) {
-        return makeUnique<Box<std::unique_ptr<typename BaseClass<T>::type>>>(std::move(value));
+        return std::make_unique<Box<std::unique_ptr<typename BaseClass<T>::type>>>(std::move(value));
     }
 
     static void assign(BoxBase &box, std::unique_ptr<T> &value) {
@@ -62,7 +62,7 @@ struct MakeUptrBox<T, false> {
     typedef ClearType<T> TC;
 
     static std::unique_ptr<BoxBase> make(std::unique_ptr<TC> value) {
-        return makeUnique<Box<std::unique_ptr<TC>>>(std::move(value));
+        return std::make_unique<Box<std::unique_ptr<TC>>>(std::move(value));
     }
 
     static void assign(BoxBase &box, std::unique_ptr<T> &value) {
@@ -127,4 +127,4 @@ struct Type<std::unique_ptr<T>> {
     }
 };
 
-}}
+}

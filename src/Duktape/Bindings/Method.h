@@ -5,13 +5,13 @@
 
 #include <duktape.h>
 
-#include "Duktape/Utils/Helpers.h"
+#include "./Utils/Helpers.h"
 
 #include "Context.h"
 
 #include "Type.h"
 
-namespace engine { namespace duk { namespace details {
+namespace duk { namespace details {
 
 template <class A, int Index>
 ClearType<A> GetArg(duk::Context &d) {
@@ -22,8 +22,6 @@ ClearType<A> GetArg(duk::Context &d) {
 
 /**
  * Method dispatcher used to call native method and push result to duktape stack
- *
- * http://stackoverflow.com/questions/7858817/unpacking-a-tuple-to-call-a-matching-function-pointer
  */
 template <class C, class R, class ... A>
 struct MethodDispatcher {
@@ -150,4 +148,4 @@ void PushMethod(duk::Context &d, R (C::*method)(A...) const) {
     Method<C, R, A...>::pushMethod(d, method);
 }
 
-}}}
+}}

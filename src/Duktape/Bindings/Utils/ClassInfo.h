@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace duk { namespace utils {
+namespace duk {
 
 /**
  * @brief Class name as string
@@ -43,13 +43,13 @@ struct IsPolymorphic {
     static constexpr bool value() { return false; }
 };
 
-}}
+}
 
 /**
  * @brief Defines class name.
  */
 #define DEF_CLASS_NAME(T) \
-    namespace engine { \
+    namespace duk { \
     template <> \
     struct ClassName<T> { \
         static constexpr bool isDefined() { return true; }; \
@@ -60,7 +60,7 @@ struct IsPolymorphic {
  * @brief Defines class short name.
  */
 #define DEF_SHORT_NAME(T, shortName) \
-    namespace engine { \
+    namespace duk { \
     template <> \
     struct ShortClassName<T> { \
         static constexpr bool isDefined() { return true; } \
@@ -68,7 +68,7 @@ struct IsPolymorphic {
     };}
 
 #define DEF_BASE_CLASS(Type, Base) \
-    namespace engine { \
+    namespace duk { \
     template <> \
     struct BaseClass<Type> { \
         static constexpr bool isDefined() { return true; } \
@@ -76,7 +76,7 @@ struct IsPolymorphic {
     };}
 
 #define DEF_POLYMORPHIC(T) \
-    namespace engine { \
+    namespace duk { \
     template <> struct IsPolymorphic<T> { \
         static constexpr bool value() { return true; } \
     };}

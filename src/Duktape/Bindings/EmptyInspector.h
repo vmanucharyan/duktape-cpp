@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace engine { namespace duk { namespace details {
+namespace duk { namespace details {
 
 class EmptyInspector {
 public:
@@ -31,4 +31,4 @@ public:
     void construct(std::unique_ptr<C> (*constructor) (A...)) {}
 };
 
-}}}
+}}

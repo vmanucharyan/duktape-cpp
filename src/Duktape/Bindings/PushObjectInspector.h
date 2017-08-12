@@ -4,7 +4,7 @@
 
 #include <duktape.h>
 
-namespace engine { namespace duk {
+namespace duk {
 
 class Context;
 
@@ -34,4 +34,4 @@ private:
     int _objIdx;
 };
 
-}}}
+}}

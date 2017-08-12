@@ -4,10 +4,10 @@
 
 #include <Duktape/Bindings/PushObjectInspector.h>
 
-#include <Duktape/Utils/Helpers.h>
-#include <Duktape/Utils/Inspect.h>
+#include "./Utils/Helpers.h"
+#include "./Utils/Inspect.h"
 
-namespace engine { namespace duk {
+namespace duk {
 
 template <class T>
 inline void Type<T>::push(duk::Context &d, T const &value) {
@@ -29,4 +29,4 @@ inline void Type<T>::get(duk::Context &d, T &value, int objIdx) {
     value = *obj;
 }
 
-}}
+}

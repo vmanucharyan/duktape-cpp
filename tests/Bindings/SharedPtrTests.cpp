@@ -2,14 +2,14 @@
 
 #include <cstdio>
 
-#include <Engine/EngineStd.h>
+#include <Duktape/Bindings/Context.inl>
 
-#include <Engine/Duktape/Bindings/Context.inl>
+#include <Duktape/Bindings/Types/All.h>
+#include <Duktape/Bindings/PushObjectInspector.inl>
 
-#include <Engine/Duktape/Bindings/Types/All.h>
-#include <Engine/Duktape/Bindings/PushObjectInspector.inl>
+#include "TestTypes.h"
 
-using namespace engine;
+using namespace duk;
 
 namespace SharedPtrTests {
 
@@ -74,8 +74,8 @@ public:
         _someField = field;
     }
 
-    void consume(up<Concrete> other) {
-        up<Concrete> ptr = std::move(other);
+    void consume(std::unique_ptr<Concrete> other) {
+        std::unique_ptr<Concrete> ptr = std::move(other);
     }
 
     template <class I>
@@ -103,7 +103,7 @@ TEST_CASE("Shared pointer type tests", "[duktape]") {
             "player.pos = {x: 14.5, y: -13.5, z: 3.3};"
             "player.health;";
 
-        auto player = makeShared<Player>(14, 87, Vec3(54, 12, 43));
+        auto player = std::make_shared<Player>(14, 87, Vec3(54, 12, 43));
         ctx.addGlobal("player", player);
 
         auto evalRes = duk_peval_string(ctx, script);
@@ -125,7 +125,7 @@ TEST_CASE("Shared pointer type tests", "[duktape]") {
         const char script[] =
             "player";
 
-        auto player = makeShared<Player>(14, 87, Vec3(54, 12, 43));
+        auto player = std::make_shared<Player>(14, 87, Vec3(54, 12, 43));
         ctx.addGlobal("player", player);
 
         auto evalRes = duk_peval_string(ctx, script);
@@ -134,15 +134,15 @@ TEST_CASE("Shared pointer type tests", "[duktape]") {
         }
         REQUIRE(evalRes == 0);
 
-        sp<Player> p;
-        duk::Type<sp<Player>>::get(ctx, p, -1);
+        std::shared_ptr<Player> p;
+        duk::Type<std::shared_ptr<Player>>::get(ctx, p, -1);
         duk_pop(ctx);
 
         REQUIRE(p == player);
     }
 
     SECTION("should be able to get pointer to polymorphic object") {
-        auto concrete = makeShared<Concrete>(Vec3(32.5f, -13.5f, 34.0f));
+        auto concrete = std::make_shared<Concrete>(Vec3(32.5f, -13.5f, 34.0f));
         ctx.addGlobal("concrete", concrete);
 
         auto evalRes = duk_peval_string(ctx, "concrete");
@@ -151,14 +151,14 @@ TEST_CASE("Shared pointer type tests", "[duktape]") {
         }
         REQUIRE(evalRes == 0);
 
-        sp<Concrete> actual;
-        duk::Type<sp<Concrete>>::get(ctx, actual, -1);
+        std::shared_ptr<Concrete> actual;
+        duk::Type<std::shared_ptr<Concrete>>::get(ctx, actual, -1);
 
         REQUIRE(actual->getField() == Vec3(32.5f, -13.5f, 34.0f));
     }
 
     SECTION("should be able to get object as shared pointer to it's base class") {
-        auto concrete = makeShared<Concrete>(Vec3(32.5f, -13.5f, 34.0f));
+        auto concrete = std::make_shared<Concrete>(Vec3(32.5f, -13.5f, 34.0f));
         ctx.addGlobal("concrete", concrete);
 
         auto evalRes = duk_peval_string(ctx, "concrete");
@@ -167,14 +167,14 @@ TEST_CASE("Shared pointer type tests", "[duktape]") {
         }
         REQUIRE(evalRes == 0);
 
-        sp<Base> base;
-        duk::Type<sp<Base>>::get(ctx, base, -1);
+        std::shared_ptr<Base> base;
+        duk::Type<std::shared_ptr<Base>>::get(ctx, base, -1);
 
         REQUIRE(base->getField() == Vec3(32.5, -13.5, 34));
     }
 
     SECTION("should be able to to push shared pointer to base class") {
-        sp<Base> base = makeShared<Concrete>(Vec3(32.5f, -13.5f, 34.0f));
+        std::shared_ptr<Base> base = std::make_shared<Concrete>(Vec3(32.5f, -13.5f, 34.0f));
 
         ctx.addGlobal("base", base);
 
@@ -199,7 +199,7 @@ TEST_CASE("Unique ptr tests", "[duktape]") {
             "player.pos = {x: 14.5, y: -13.5, z: 3.3};"
             "player.health";
 
-        auto player = makeUnique<Player>(14, 87, Vec3(54.0f, 12.0f, 43.0f));
+        auto player = std::make_unique<Player>(14, 87, Vec3(54.0f, 12.0f, 43.0f));
 
         Player * playerPtr = player.get();
 
@@ -221,19 +221,19 @@ TEST_CASE("Unique ptr tests", "[duktape]") {
     }
 
     SECTION("should be able to push and get unique_ptr") {
-        auto player = makeUnique<Player>(14, 87, Vec3(54.0f, 12.0f, 43.0f));
+        auto player = std::make_unique<Player>(14, 87, Vec3(54.0f, 12.0f, 43.0f));
         auto expectedPlayer = *player;
 
-        duk::Type<up<Player>>::push(ctx, std::move(player));
+        duk::Type<std::unique_ptr<Player>>::push(ctx, std::move(player));
 
-        up<Player> actualPlayer;
-        duk::Type<up<Player>>::get(ctx, actualPlayer, -1);
+        std::unique_ptr<Player> actualPlayer;
+        duk::Type<std::unique_ptr<Player>>::get(ctx, actualPlayer, -1);
 
         REQUIRE(*actualPlayer == expectedPlayer);
     }
 
     SECTION("should be able to get object as unique pointer to it's base class") {
-        auto concrete = makeUnique<Concrete>(Vec3(32.5f, -13.5f, 34.0f));
+        auto concrete = std::make_unique<Concrete>(Vec3(32.5f, -13.5f, 34.0f));
         ctx.addGlobal("concrete", std::move(concrete));
 
         auto evalRes = duk_peval_string(ctx, "concrete");
@@ -242,14 +242,14 @@ TEST_CASE("Unique ptr tests", "[duktape]") {
         }
         REQUIRE(evalRes == 0);
 
-        up<Base> base;
-        duk::Type<up<Base>>::get(ctx, base, -1);
+        std::unique_ptr<Base> base;
+        duk::Type<std::unique_ptr<Base>>::get(ctx, base, -1);
 
         REQUIRE(base->getField() == Vec3(32.5f, -13.5f, 34.0f));
     }
 
     SECTION("should be able to get pointer to polymorphic object") {
-        auto concrete = makeUnique<Concrete>(Vec3(32.5f, -13.5f, 34.0f));
+        auto concrete = std::make_unique<Concrete>(Vec3(32.5f, -13.5f, 34.0f));
         ctx.addGlobal("concrete", std::move(concrete));
 
         auto evalRes = duk_peval_string(ctx, "concrete");
@@ -258,14 +258,15 @@ TEST_CASE("Unique ptr tests", "[duktape]") {
         }
         REQUIRE(evalRes == 0);
 
-        up<Concrete> actual;
-        duk::Type<up<Concrete>>::get(ctx, actual, -1);
+        std::unique_ptr<Concrete> actual;
+        duk::Type<std::unique_ptr<Concrete>>::get(ctx, actual, -1);
 
         REQUIRE(actual->getField() == Vec3(32.5f, -13.5f, 34.0f));
     }
 
     SECTION("should be able to to push unique pointer to base class") {
-        sp<Base> base = makeUnique<Concrete>(Vec3(32.5f, -13.5f, 34));
+        auto base = std::make_unique<Concrete>(Vec3(32.5f, -13.5f, 34));
+        Base* basePtr = base.get();
 
         ctx.addGlobal("base", std::move(base));
 
@@ -275,16 +276,6 @@ TEST_CASE("Unique ptr tests", "[duktape]") {
         }
         REQUIRE(evalRes == 0);
 
-        REQUIRE(base->getField() == Vec3(-5, -6, -7));
-    }
-
-    SECTION("should throw exception when trying to access moved unique pointer") {
-        auto c1 = makeUnique<Concrete>(Vec3(32.5f, -13.5f, 34.0f));
-        auto c2 = makeUnique<Concrete>(Vec3(32.5f, -13.5f, 34.0f));
-
-        ctx.addGlobal("c1", std::move(c1));
-        ctx.addGlobal("c2", std::move(c2));
-
-        REQUIRE_THROWS(ctx.evalStringNoRes("c2.consume(c1); c1.getField()"));
+        REQUIRE(basePtr->getField() == Vec3(-5, -6, -7));
     }
 }

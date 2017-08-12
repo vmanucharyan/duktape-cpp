@@ -5,15 +5,16 @@
 
 #include <duktape.h>
 
-#include <Engine/EngineStd.h>
-#include <Engine/Common/Utils/ClassInfo.h>
+#include <Duktape/Bindings/Utils/ClassInfo.h>
 
-#include <Engine/Duktape/Bindings/Context.inl>
-#include <Engine/Duktape/Bindings/Types/All.h>
-#include <Engine/Duktape/Bindings/Method.h>
-#include <Engine/Duktape/Bindings/PushObjectInspector.inl>
+#include <Duktape/Bindings/Context.inl>
+#include <Duktape/Bindings/Types/All.h>
+#include <Duktape/Bindings/Method.h>
+#include <Duktape/Bindings/PushObjectInspector.inl>
 
-using namespace engine;
+#include "TestTypes.h"
+
+using namespace duk;
 using namespace fakeit;
 
 namespace MethodTests {
@@ -56,8 +57,8 @@ public:
     virtual void constMethod(int a) const = 0;
     virtual Vec3 const & vecRefNoArgs() const = 0;
     virtual ITest2 const & refComplexNoArgs() const = 0;
-    virtual sp<ITest2> returnSharedPtr() = 0;
-    virtual void sharedPtrArg(sp<ITest2> const &test2) const = 0;
+    virtual std::shared_ptr<ITest2> returnSharedPtr() = 0;
+    virtual void sharedPtrArg(std::shared_ptr<ITest2> const &test2) const = 0;
 };
 }
 
@@ -214,14 +215,14 @@ TEST_CASE("Method bindings tests", "[duktape]") {
         }
 
         SECTION("should handle methods with shared pointer arguments") {
-            auto test2 = makeShared<ITest2>();
+            auto test2 = std::make_shared<ITest2>();
             Mock<ITest2> spy2(*test2);
 
             const char script[] = "test.sharedPtrArg(test2);";
 
             Mock<ITest> mock;
             bool argsMatched = false;
-            When(Method(mock, sharedPtrArg)).Do([&argsMatched, test2] (sp<ITest2> const &arg) {
+            When(Method(mock, sharedPtrArg)).Do([&argsMatched, test2] (std::shared_ptr<ITest2> const &arg) {
                 argsMatched = arg == test2;
             });
 
@@ -371,7 +372,7 @@ TEST_CASE("Method bindings tests", "[duktape]") {
                 "test2.someMethod(5374, {x: 31.5, y: -5.3, z: 6.9});";
 
             bool argsMatched;
-            sp<ITest2> test2 = makeShared<ITest2>();
+            std::shared_ptr<ITest2> test2 = std::make_shared<ITest2>();
             Mock<ITest2> mock2(*test2);
             When(Method(mock2, someMethod)).AlwaysDo([&argsMatched] (float number, Vec3 vec) -> Vec2 {
                 argsMatched = (number == 5374) && (vec == Vec3(31.5f, -5.3f, 6.9f));
@@ -379,7 +380,7 @@ TEST_CASE("Method bindings tests", "[duktape]") {
             });
 
             Mock<ITest> mock1;
-            When(Method(mock1, returnSharedPtr)).AlwaysDo([test2] () -> sp<ITest2> {
+            When(Method(mock1, returnSharedPtr)).AlwaysDo([test2] () -> std::shared_ptr<ITest2> {
                 return test2;
             });
             ITest &test1 = mock1.get();
@@ -423,7 +424,7 @@ TEST_CASE("Method bindings tests", "[duktape]") {
             When(Method(mock, sharedPtrArg)).AlwaysReturn();
             ITest &test = mock.get();
 
-            auto test2 = makeShared<Test2>();
+            auto test2 = std::make_shared<Test2>();
 
             d.addGlobal("test2", test2);
             registerMethod(d, "test", "sharedPtrArg", &test, &ITest::sharedPtrArg);

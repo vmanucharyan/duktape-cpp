@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-namespace engine {
+namespace duk {
 
 template <class A> using ClearType = typename std::decay<A>::type;
 

@@ -10,7 +10,7 @@
 
 #include "Box.h"
 
-namespace engine { namespace duk {
+namespace duk {
 
 /**
  * @brief Wrapper around duktape context
@@ -23,14 +23,14 @@ public:
      * @brief constructor from script id
      * @param scriptId script asset id
      */
-    Context(std::string const &scriptId = "");
+    explicit Context(std::string const &scriptId = "");
     ~Context();
 
     Context(const Context &) = delete;
     Context & operator = (const Context &) = delete;
 
-    Context(Context && that);
-    Context & operator = (Context && that);
+    Context(Context && that) noexcept;
+    Context & operator = (Context && that) noexcept;
 
     /**
      * @brief Get pointer to duk_context
@@ -45,13 +45,13 @@ public:
     operator duk_context*() const { return _ctx; }
 
     /**
-     * @brief Store a Box in the context
-     * @details Box usually contains some native resource, used from script, that
-     *          needs to be stored somewhere, for example shared or unique pointers.
+     * @brief   Store a Box in the context
+     * @details Box contains some native resource, used from script,
+     *          for example shared or unique pointers.
      * @param box box to store
      * @returns integer key to access box
      */
-    int storeBox(up<BoxBase> box);
+    int storeBox(std::unique_ptr<BoxBase> box);
 
     /**
      * @brief Get box from context
@@ -145,7 +145,7 @@ private:
     duk_context *_ctx;
     std::string _scriptId;
     std::atomic_int _boxCounter { 0 };
-    std::map<int, up<BoxBase>> _boxes;
+    std::map<int, std::unique_ptr<BoxBase>> _boxes;
     int _objectRefCounter { 0 };
 
     template <class T>
@@ -156,4 +156,4 @@ private:
     void assignSelf();
 };
 
-}}
+}

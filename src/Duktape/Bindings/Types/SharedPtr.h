@@ -12,7 +12,7 @@
 #include "../Type.h"
 #include "../Context.h"
 
-namespace engine { namespace duk {
+namespace duk {
 
 namespace details {
 
@@ -25,7 +25,7 @@ struct SptrBox {
 template <class T>
 struct SptrBox<T, true> {
     static std::unique_ptr<BoxBase> make(std::shared_ptr<T> const &value) {
-        return makeUnique<Box<std::shared_ptr<typename BaseClass<T>::type>>>(value);
+        return std::make_unique<Box<std::shared_ptr<typename BaseClass<T>::type>>>(value);
     }
 
     static void assign(BoxBase const &box, std::shared_ptr<T> &value) {
@@ -39,7 +39,7 @@ struct SptrBox<T, false> {
     typedef ClearType<T> TC;
 
     static std::unique_ptr<BoxBase> make(std::shared_ptr<TC> const &value) {
-        return makeUnique<Box<std::shared_ptr<TC>>>(value);
+        return std::make_unique<Box<std::shared_ptr<TC>>>(value);
     }
 
     static void assign(BoxBase const &box, std::shared_ptr<T> &value) {
@@ -109,4 +109,4 @@ struct Type<std::shared_ptr<T>> {
     }
 };
 
-}}
+}

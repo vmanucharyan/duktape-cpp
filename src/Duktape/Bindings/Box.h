@@ -4,11 +4,11 @@
 
 #include <boost/any.hpp>
 
-namespace engine { namespace duk {
+namespace duk {
 
 class BoxBase {
 public:
-    virtual ~BoxBase() {}
+    virtual ~BoxBase() {};
 
     template <class T>
     T & as() {
@@ -45,4 +45,4 @@ private:
     boost::any _value;
 };
 
-}}
+}

@@ -4,7 +4,7 @@
 
 #include "Context.h"
 
-namespace engine { namespace duk {
+namespace duk {
 
 class Context;
 
@@ -28,4 +28,4 @@ struct Type {
     static void get(duk::Context &d, T &val, int index);
 };
 
-}}
+}

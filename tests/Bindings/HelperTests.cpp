@@ -3,9 +3,9 @@
 #include <string>
 #include <vector>
 
-#include <Engine/Common/Utils/Helpers.h>
+#include <Duktape/Bindings/Utils/Helpers.h>
 
-using namespace engine;
+using namespace duk;
 
 TEST_CASE("helper tests", "[duktape]") {
     SECTION("splitNamespaces") {

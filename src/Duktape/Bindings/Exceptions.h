@@ -1,6 +1,6 @@
 #pragma once
 
-namespace engine { namespace duk {
+namespace duk {
 
 class DuktapeException: public std::runtime_error {
 public:
@@ -14,4 +14,4 @@ public:
         : DuktapeException(what) {}
 };
 
-}}
+}

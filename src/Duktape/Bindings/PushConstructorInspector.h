@@ -5,7 +5,7 @@
 #include "EmptyInspector.h"
 #include "Constructor.h"
 
-namespace engine { namespace duk { namespace details {
+namespace duk { namespace details {
 
 class PushConstructorInspector: public EmptyInspector {
 public:
@@ -26,4 +26,4 @@ private:
     duk::Context &_ctx;
 };
 
-}}}
+}}

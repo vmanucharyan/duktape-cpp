@@ -1,29 +1,18 @@
 #include <catch/catch.hpp>
-#include <catch/fakeit.hpp>
 
-#include <Engine/EngineStd.h>
-
-#include <Engine/Game/Actors/Actor.h>
-#include <Engine/Game/Actors/ActorComponent.h>
-
-#include <Engine/Game/Events/EventBase.h>
-#include <Engine/Game/Events/EventManager.h>
-
-#include <Engine/Duktape/Bindings/Prelude.h>
-
-using namespace engine;
+#include <Duktape/Bindings/Prelude.h>
 
 namespace ContextTests {
 
 class Player {
 public:
     static std::shared_ptr<Player> CreatePlayer(int id) {
-        return makeShared<Player>(id);
+        return std::make_shared<Player>(id);
     }
 
-    Player(): _id(0) {}
+    Player() {}
 
-    Player(int id): _id(id) {}
+    explicit Player(int id): _id(id) {}
 
     template <class Inspector>
     static void inspect(Inspector &i) {
@@ -34,48 +23,7 @@ public:
     int id() const { return this->_id; }
     void setId(int id) { this->_id = id; }
 
-    int _id;
-};
-
-class PositionComponent: public ActorComponent<PositionComponent> {
-public:
-    static sp<PositionComponent> Construct(Vec3 const &pos) {
-        return makeShared<PositionComponent>(pos);
-    }
-
-    PositionComponent(Vec3 const &pos): _pos(pos) {}
-
-    Vec3 const & pos() const { return _pos; }
-    void setPos(Vec3 const &value) { _pos = value; }
-
-    template <class I>
-    static void inspect(I &i) {
-        i.construct(&PositionComponent::Construct);
-        i.property("pos", &PositionComponent::pos, &PositionComponent::setPos);
-    }
-
-private:
-    Vec3 _pos;
-};
-
-class DeathEvent: public Event<DeathEvent> {
-public:
-    static up<DeathEvent> Construct(std::string const &actorId) {
-        return makeUnique<DeathEvent>(actorId);
-    }
-
-    DeathEvent(std::string const &actorId): _actorId(actorId) {}
-
-    std::string const & actorId() const { return _actorId; }
-
-    template <class I>
-    static void inspect(I &i) {
-        i.construct(&DeathEvent::Construct);
-        i.property("actorId", &DeathEvent::actorId);
-    }
-
-private:
-    std::string _actorId;
+    int _id {0};
 };
 
 enum class TestEnum {
@@ -83,9 +31,42 @@ enum class TestEnum {
     VALUE_2 = 2
 };
 
+class Players {
+public:
+    Players() = default;
+
+    void addPlayer(const std::shared_ptr<Player> &player) {
+        _players.push_back(player);
+    }
+
+    std::shared_ptr<Player> getPlayer(int id) {
+        std::shared_ptr<Player> res;
+
+        auto v = std::find_if(
+            _players.begin(), _players.end(),
+            [this, id] (auto p) { return p->id() == id; }
+        );
+
+        if (v != _players.end()) {
+            res = *v;
+        }
+
+        return res;
+    }
+
+    template <class Inspector>
+    static void inspect(Inspector &i) {
+        i.method("addPlayer", &Players::addPlayer);
+        i.method("getPlayer", &Players::getPlayer);
+    }
+
+private:
+    std::vector<std::shared_ptr<Player>> _players;
+};
+
 }
 
-namespace engine {
+namespace duk {
 
 template <>
 struct Inspect<ContextTests::TestEnum> {
@@ -95,8 +76,6 @@ struct Inspect<ContextTests::TestEnum> {
         i.constant("VALUE_2", ContextTests::TestEnum::VALUE_2);
     }
 };
-
-namespace duk {
 
 template <>
 struct Type<ContextTests::TestEnum> {
@@ -110,11 +89,8 @@ struct Type<ContextTests::TestEnum> {
 };
 
 }
-}
 
 DEF_CLASS_NAME(ContextTests::Player);
-DEF_CLASS_NAME(ContextTests::PositionComponent);
-DEF_CLASS_NAME(ContextTests::DeathEvent);
 DEF_CLASS_NAME(ContextTests::TestEnum);
 
 TEST_CASE("Context", "[duktape]") {
@@ -130,8 +106,8 @@ TEST_CASE("Context", "[duktape]") {
 
             duk_eval_string(ctx, script);
 
-            sp<ContextTests::Player> popped;
-            duk::Type<sp<ContextTests::Player>>::get(ctx,  popped, -1);
+            std::shared_ptr<ContextTests::Player> popped;
+            duk::Type<std::shared_ptr<ContextTests::Player>>::get(ctx,  popped, -1);
             duk_pop(ctx);
 
             REQUIRE(popped->id() == 9);
@@ -156,70 +132,23 @@ TEST_CASE("Context", "[duktape]") {
     SECTION("addGlobal") {
         duk::Context d;
 
-        auto ev = makeShared<EventManager>();
-        auto am = makeShared<ActorsManager>(ev);
+        auto players = std::make_shared<Players>();
 
-        d.addGlobal("Actors", am);
+        d.registerClass<Player>();
+        d.addGlobal("Players", players);
 
         SECTION("should push shared ptr objects") {
-            auto player = makeShared<Actor>("player");
-            am->addActor(player);
-            const char script[] = "Actors.getActor('player')";
+            const char script[] =
+                "var p = new ContextTests.Player(5);\n"
+                "Players.addPlayer(p);\n"
+                "Players.getPlayer(5)";
 
             duk_eval_string(d, script);
 
-            sp<Actor> stackActor;
-            duk::Type<sp<Actor>>::get(d, stackActor, -1);
+            std::shared_ptr<Player> stackPlayer;
+            duk::Type<std::shared_ptr<Player>>::get(d, stackPlayer, -1);
 
-            REQUIRE(stackActor == player);
-        }
-    }
-
-    SECTION("registerComponent") {
-        duk::Context d;
-
-        auto ev = makeShared<EventManager>();
-        auto am = makeShared<ActorsManager>(ev);
-
-        d.addGlobal("Actors", am);
-        d.registerComponent<PositionComponent>();
-
-        SECTION("should register function in js that gets component from actor") {
-            auto player = makeShared<Actor>("player");
-            player->attachComponent<PositionComponent>(Vec3(1, 2, 3));
-
-            am->addActor(player);
-            const char script[] =
-                "var actor = Actors.getActor('player')\n"
-                "var pc = ContextTests.PositionComponent(actor)\n"
-                "pc.pos = { x: 3, y: 4, z: 5.5 }\n";
-
-            d.evalStringNoRes(script);
-
-            REQUIRE(player->getComponent<PositionComponent>()->pos() == Vec3(3, 4, 5.5f));
-
-            SECTION("component should have detach method") {
-                const char scriptDetach[] =
-                    "var actor = Actors.getActor('player')\n"
-                    "ContextTests.PositionComponent(actor).detach()\n";
-
-                d.evalStringNoRes(scriptDetach);
-
-                REQUIRE(player->getComponent<PositionComponent>() == nullptr);
-            }
-        }
-
-        SECTION("should register function in js that makes component") {
-            const char script[] =
-                "var actor = Actors.makeActor('player');"
-                "var pc = new ContextTests.PositionComponent(actor, { x: 5, y: 4, z: 3 });";
-
-            d.evalStringNoRes(script);
-
-            auto player = am->getActor("player");
-            auto pc = player->getComponent<PositionComponent>();
-
-            REQUIRE(pc->pos() == Vec3(5.0f, 4.0f, 3.0f));
+            REQUIRE(stackPlayer->id() == 5);
         }
     }
 
@@ -237,44 +166,6 @@ TEST_CASE("Context", "[duktape]") {
         }
 
         SECTION("should not pollute stack") {
-            REQUIRE(duk_get_top(d) == 0);
-        }
-    }
-
-    SECTION("registerEvent") {
-        duk::Context d;
-
-        SECTION("should register event class constructor") {
-            // arrange
-            const char script[] = "new ContextTests.DeathEvent('player1')";
-            d.registerEvent<DeathEvent>();
-
-            // act
-            up<DeathEvent> evalRes;
-            d.evalString(evalRes, script);
-
-            // assert
-            REQUIRE(evalRes->actorId() == "player1");
-        }
-
-        SECTION("should register nested `Delegate` class") {
-            // arrange
-            const char script[] = "new ContextTests.DeathEvent.Delegate(function () { })";
-            d.registerEvent<DeathEvent>();
-
-            // act
-            sp<DeathEvent::Delegate> evalRes;
-            d.evalString(evalRes, script);
-
-            // assert
-            REQUIRE(evalRes != nullptr);
-        }
-
-        SECTION("should not pollute stack") {
-            // act
-            d.registerEvent<DeathEvent>();
-
-            // assert
             REQUIRE(duk_get_top(d) == 0);
         }
     }

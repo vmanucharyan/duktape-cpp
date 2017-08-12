@@ -1,13 +1,13 @@
 #include "Context.h"
 
 #include <sstream>
+#include <cassert>
 
 #include "Exceptions.h"
 
-namespace engine { namespace duk {
+namespace duk {
 
-Context::Context(std::string const &scriptId)
-: _ctx(nullptr), _scriptId(scriptId) {
+Context::Context(std::string const &scriptId) : _ctx(nullptr), _scriptId(scriptId) {
     _ctx = duk_create_heap_default();
     assignSelf();
 }
@@ -18,13 +18,12 @@ Context::~Context() {
     }
 }
 
-Context::Context(Context &&that)
-    : _ctx(that._ctx), _scriptId(that._scriptId) {
+Context::Context(Context &&that) noexcept : _ctx(that._ctx), _scriptId(that._scriptId) {
     that._ctx = nullptr;
     assignSelf();
 }
 
-Context &Context::operator=(Context &&that) {
+Context &Context::operator=(Context &&that) noexcept {
     if (this == &that) {
         return *this;
     }
@@ -38,7 +37,7 @@ Context &Context::operator=(Context &&that) {
     return *this;
 }
 
-int Context::storeBox(up<BoxBase> box) {
+int Context::storeBox(std::unique_ptr<BoxBase> box) {
     _boxCounter += 1;
     _boxes[_boxCounter] = std::move(box);
     return _boxCounter;
@@ -146,4 +145,4 @@ void Context::getRef(int key) {
     duk_pop_2(_ctx);
 }
 
-}}
+}

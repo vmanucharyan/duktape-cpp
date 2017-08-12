@@ -3,19 +3,15 @@
 
 #include <string>
 
-#include <format.h>
+#include <Duktape/Bindings/Context.inl>
+#include <Duktape/Bindings/Types/All.h>
+#include <Duktape/Bindings/PushObjectInspector.h>
+#include <Duktape/Bindings/PushObjectInspector.inl>
+#include <Duktape/Bindings/Utils/Inspect.h>
 
-#include <math/Vec3.h>
+#include "TestTypes.h"
 
-#include <Engine/Duktape/Bindings/Context.inl>
-
-#include <Engine/Duktape/Bindings/Types/All.h>
-
-#include <Engine/Duktape/Bindings/PushObjectInspector.h>
-#include <Engine/Duktape/Bindings/PushObjectInspector.inl>
-#include <Engine/Common/Utils/Inspect.h>
-
-using namespace engine;
+using namespace duk;
 
 namespace PushObjectInspectorTests {
 class Player {
@@ -37,7 +33,7 @@ public:
     }
 
     std::string toString() const {
-        return fmt::format("id: {}, health: {}", id(), health());
+        return "id: {" + std::to_string(id()) + "}, health: {" + std::to_string(health()) + "}";
     }
 
     template <class Inspector>

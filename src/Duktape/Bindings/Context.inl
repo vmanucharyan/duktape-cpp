@@ -2,9 +2,9 @@
 
 #include <utility>
 
-#include <Engine/Game/Events/EventDelegate.h>
-#include <Engine/Common/Utils/Helpers.h>
-#include <Engine/Common/Utils/Inspect.h>
+#include "./Utils/ClassInfo.h"
+#include "./Utils/Helpers.h"
+#include "./Utils/Inspect.h"
 
 #include "Context.h"
 
@@ -13,7 +13,7 @@
 #include "PushConstructorInspector.h"
 
 
-namespace engine { namespace duk {
+namespace duk {
 
 template <class T>
 inline void Context::addGlobal(const char *name, T &&val) {
@@ -43,15 +43,6 @@ inline void Context::registerClass() {
 }
 
 template <class T>
-inline void Context::registerComponent() {
-    duk_push_global_object(_ctx);
-    auto namespaces = splitNamespaces(std::string(GetClassName<T>()));
-    int depth = defNamespaces(namespaces);
-    details::Component<T>::registerComponent(*this, namespaces.back().c_str(), -1);
-    duk_pop_n(_ctx, depth);
-}
-
-template <class T>
 inline void Context::evalString(T &res, const char *str) {
     duk_int_t ret = duk_peval_string(_ctx, str);
     if (ret != 0) {
@@ -60,28 +51,6 @@ inline void Context::evalString(T &res, const char *str) {
 
     Type<T>::get(*this, res, -1);
     duk_pop(_ctx);
-}
-
-template <class T>
-inline void Context::registerEvent() {
-    // Register class
-    registerClass<T>();
-
-    // Push nested delegate type (e.g. engine.CollisionEvent.Delegate)
-    duk_push_global_object(_ctx);
-    auto ns = splitNamespaces(std::string(GetClassName<T>()));
-    int depth = 0;
-    for (auto const &n: ns) {
-        duk_get_prop_string(_ctx, -1, n.c_str());
-        depth += 1;
-    }
-
-    // Push event delegate constructor
-    details::PushConstructorInspector i(*this);
-    Inspect<EventDelegate<T>>::inspect(i);
-    duk_put_prop_string(_ctx, -2, "Delegate");
-
-    duk_pop_n(_ctx, depth + 1);
 }
 
 namespace details {
@@ -119,4 +88,4 @@ inline void Context::registerEnum() {
     duk_pop_n(_ctx, depth); // namespaces
 }
 
-}}
+}

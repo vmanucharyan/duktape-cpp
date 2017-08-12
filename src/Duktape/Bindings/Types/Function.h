@@ -8,9 +8,7 @@
 #include "../Type.h"
 #include "../Exceptions.h"
 
-namespace engine { namespace duk {
-
-namespace details {
+namespace duk { namespace details {
 
 template <class R>
 struct JSFunctionReturnVal {
@@ -171,4 +169,4 @@ struct Type<std::function<R(A...)>> {
     }
 };
 
-}}
+}

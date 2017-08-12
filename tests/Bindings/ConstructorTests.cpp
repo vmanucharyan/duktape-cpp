@@ -1,27 +1,24 @@
 #include <catch/catch.hpp>
-#include <catch/fakeit.hpp>
+
+#include <iostream>
 
 #include <utility>
 
-#include <Engine/EngineStd.h>
+#include <Duktape/Bindings/Prelude.h>
 
-#include <Engine/Duktape/Bindings/Context.h>
+#include "TestTypes.h"
 
-#include <Engine/Duktape/Bindings/Types/All.h>
-#include <Engine/Duktape/Bindings/Constructor.inl>
-#include <Engine/Duktape/Bindings/PushConstructorInspector.h>
-#include <Engine/Duktape/Bindings/PushObjectInspector.inl>
-
-using namespace engine;
+using namespace duk;
 
 namespace ConstructorTests {
+
 class SimpleConstructible {
 public:
-    static sp<SimpleConstructible> Construct(float fieldOne, Vec2 const &fieldTwo) {
-        return makeShared<SimpleConstructible>(fieldOne, fieldTwo);
+    static std::shared_ptr<SimpleConstructible> Construct(float fieldOne, Vec2 const &fieldTwo) {
+        return std::make_shared<SimpleConstructible>(fieldOne, fieldTwo);
     }
 
-    SimpleConstructible(): _fieldOne(0) {}
+    SimpleConstructible(): _fieldOne(0), _fieldTwo(0.0f, 0.0f) {}
 
     SimpleConstructible(float fieldOne, Vec2 const &fieldTwo)
         : _fieldOne(fieldOne), _fieldTwo(fieldTwo) {}
@@ -46,17 +43,17 @@ private:
 
 class ComplexConstructible {
 public:
-    static sp<ComplexConstructible> Construct(sp<SimpleConstructible> const &fieldOne, Vec2 const &fieldTwo) {
-        return makeShared<ComplexConstructible>(fieldOne, fieldTwo);
+    static std::shared_ptr<ComplexConstructible> Construct(std::shared_ptr<SimpleConstructible> const &fieldOne, Vec2 const &fieldTwo) {
+        return std::make_shared<ComplexConstructible>(fieldOne, fieldTwo);
     }
 
     ComplexConstructible() {}
 
-    ComplexConstructible(sp<SimpleConstructible> const &fieldOne, Vec2 const &fieldTwo)
+    ComplexConstructible(std::shared_ptr<SimpleConstructible> const &fieldOne, Vec2 const &fieldTwo)
         : _fieldOne(fieldOne), _fieldTwo(fieldTwo) {}
 
-    sp<SimpleConstructible> const & fieldOne() const { return _fieldOne; }
-    void setFieldOne(sp<SimpleConstructible> const &value) { _fieldOne = value; }
+    std::shared_ptr<SimpleConstructible> const & fieldOne() const { return _fieldOne; }
+    void setFieldOne(std::shared_ptr<SimpleConstructible> const &value) { _fieldOne = value; }
 
     Vec2 const & fieldTwo() const { return _fieldTwo; }
     void setFieldTwo(Vec2 const &value) { _fieldTwo = value; }
@@ -69,14 +66,14 @@ public:
     }
 
 private:
-    sp<SimpleConstructible> _fieldOne;
+    std::shared_ptr<SimpleConstructible> _fieldOne;
     Vec2 _fieldTwo;
 };
 
 class NoArgsConstructible {
 public:
-    static sp<NoArgsConstructible> Construct() {
-        return makeShared<NoArgsConstructible>();
+    static std::shared_ptr<NoArgsConstructible> Construct() {
+        return std::make_shared<NoArgsConstructible>();
     }
 
     NoArgsConstructible() : _field(Vec2(1, 2)) {}
@@ -117,8 +114,8 @@ TEST_CASE("PushConstructorInspector", "[duktape]") {
         }
         REQUIRE(evalRes == 0);
 
-        sp<NoArgsConstructible> obj;
-        duk::Type<sp<NoArgsConstructible>>::get(d, obj, -1);
+        std::shared_ptr<NoArgsConstructible> obj;
+        duk::Type<std::shared_ptr<NoArgsConstructible>>::get(d, obj, -1);
 
         REQUIRE(obj->field() == Vec2(-1, -2));
     }
@@ -137,8 +134,8 @@ TEST_CASE("PushConstructorInspector", "[duktape]") {
         }
         REQUIRE(evalRes == 0);
 
-        sp<SimpleConstructible> obj;
-        duk::Type<sp<SimpleConstructible>>::get(d, obj, -1);
+        std::shared_ptr<SimpleConstructible> obj;
+        duk::Type<std::shared_ptr<SimpleConstructible>>::get(d, obj, -1);
 
         REQUIRE(obj->fieldOne() == 1.5f);
         REQUIRE(obj->fieldTwo() == Vec2(1, 2));
@@ -165,8 +162,8 @@ TEST_CASE("PushConstructorInspector", "[duktape]") {
         }
         REQUIRE(evalRes == 0);
 
-        sp<ComplexConstructible> obj;
-        duk::Type<sp<ComplexConstructible>>::get(d, obj, -1);
+        std::shared_ptr<ComplexConstructible> obj;
+        duk::Type<std::shared_ptr<ComplexConstructible>>::get(d, obj, -1);
 
         REQUIRE(obj->fieldOne()->fieldOne() == 1.5);
         REQUIRE(obj->fieldOne()->fieldTwo() == Vec2(1, 2));

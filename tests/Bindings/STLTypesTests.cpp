@@ -4,16 +4,18 @@
 
 #include <duktape.h>
 
-#include <Engine/Duktape/Bindings/Prelude.h>
+#include <Duktape/Bindings/Prelude.h>
 
-using namespace engine;
+#include "TestTypes.h"
+
+using namespace duk;
 
 namespace STLTypesTests {
 
 class PositionComponent {
 public:
-    static sp<PositionComponent> Construct(Vec3 const &pos) {
-        return makeShared<PositionComponent>(pos);
+    static std::shared_ptr<PositionComponent> Construct(Vec3 const &pos) {
+        return std::make_shared<PositionComponent>(pos);
     }
 
     PositionComponent(Vec3 const &pos): _pos(pos) {}
@@ -68,15 +70,15 @@ TEST_CASE("STL Types") {
     }
 
     SECTION("std::vector of objects") {
-        std::vector<sp<PositionComponent>> v {
-            makeShared<PositionComponent>(Vec3(1.0f, 2.0f, 3.0f)),
-            makeShared<PositionComponent>(Vec3(4.0f, 5.0f, 6.0f))
+        std::vector<std::shared_ptr<PositionComponent>> v {
+            std::make_shared<PositionComponent>(Vec3(1.0f, 2.0f, 3.0f)),
+            std::make_shared<PositionComponent>(Vec3(4.0f, 5.0f, 6.0f))
         };
 
-        duk::Type<std::vector<sp<PositionComponent>>>::push(d, v);
+        duk::Type<std::vector<std::shared_ptr<PositionComponent>>>::push(d, v);
 
-        std::vector<sp<PositionComponent>> popped;
-        duk::Type<std::vector<sp<PositionComponent>>>::get(d, popped, -1);
+        std::vector<std::shared_ptr<PositionComponent>> popped;
+        duk::Type<std::vector<std::shared_ptr<PositionComponent>>>::get(d, popped, -1);
 
         duk_pop(d);
 

@@ -1,36 +1,29 @@
 cmake_minimum_required(VERSION 2.8.11)
 
-set(projname engine_duktape_tests)
+set(projname duktape_plus_tests)
 
-file(GLOB_RECURSE source_files "*.cpp")
-file(GLOB_RECURSE header_files "*.h")
+set(header_files Bindings/TestTypes.h)
 
-set(dependencies
-    math_lib
-    engine_main
-    engine_duktape
+set(source_files main.cpp
+    Bindings/ConstructorTests.cpp
+    Bindings/ContextTests.cpp
+    Bindings/FunctionTests.cpp
+    Bindings/HelperTests.cpp
+    Bindings/MethodTests.cpp
+    Bindings/PushObjectInspectorTests.cpp
+    Bindings/SharedPtrTests.cpp
+    Bindings/STLTypesTests.cpp
 )
 
 add_executable(${projname} ${source_files} ${header_files})
 add_test(${projname} ${projname})
 
 # duktape
-include_directories(${duktape_SOURCE_DIR})
-target_link_libraries(${TARGET} duktape)
+include_directories(${duktape_SOURCE_DIR}/src)
+target_link_libraries(${projname} duktape)
+target_link_libraries(${projname} duktape_plus)
 
 # catch
-# import_catch(${projname})
-
-foreach(dep ${dependencies})
-    get_property(dep_includes TARGET ${dep} PROPERTY INCLUDE_DIRECTORIES)
-    include_directories(${dep_includes})
-    target_link_libraries(${projname} ${dep} ${${dep}_LIB_DEPENDS})
-endforeach()
-
-if (${CMAKE_GENERATOR} MATCHES "Visual Studio.*")
-    set_property(TARGET ${projname} PROPERTY FOLDER engine/extensions/duktape)
-endif()
-
-create_clang_complete(${projname})
+include_directories(${CMAKE_SOURCE_DIR}/dependencies/catch)
 
 set_property(TARGET ${projname} PROPERTY CXX_STANDARD 14)

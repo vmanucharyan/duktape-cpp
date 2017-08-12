@@ -5,7 +5,7 @@
 #include "../Context.h"
 #include "../Type.h"
 
-namespace engine { namespace duk {
+namespace duk {
 
 template <>
 struct Type<std::string> {
@@ -43,4 +43,4 @@ struct Type<std::vector<T>> {
     }
 };
 
-}}
+}

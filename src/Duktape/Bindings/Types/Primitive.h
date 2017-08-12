@@ -1,6 +1,6 @@
 #include "../Type.h"
 
-namespace engine { namespace duk {
+namespace duk {
 
 template <>
 struct Type<int> {
@@ -46,4 +46,4 @@ struct Type<bool> {
     }
 };
 
-}}
+}

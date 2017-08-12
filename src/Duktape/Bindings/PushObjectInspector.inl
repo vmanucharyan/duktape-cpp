@@ -4,7 +4,7 @@
 
 #include "Method.h"
 
-namespace engine { namespace duk { namespace details {
+namespace duk { namespace details {
 
 template <class C, class A>
 inline void PushObjectInspector::property(const char *name, Getter<C, A> getter, Setter<C, A> setter) {
@@ -42,4 +42,4 @@ inline void PushObjectInspector::method(const char *name, R(C::*method)(A...) co
     duk_put_prop_string(_d, _objIdx, name);
 }
 
-}}}
+}}

@@ -2,7 +2,7 @@
 
 #include <regex>
 
-namespace engine {
+namespace duk {
 
 std::vector<std::string> splitNamespaces(std::string const &className) {
     std::regex re("::");
