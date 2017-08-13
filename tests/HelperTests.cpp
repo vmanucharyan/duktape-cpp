@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include <Duktape/Bindings/Utils/Helpers.h>
+#include <duktape-cpp/Utils/Helpers.h>
 
 using namespace duk;
 

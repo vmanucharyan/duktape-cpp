@@ -2,10 +2,10 @@
 
 #include <cstdio>
 
-#include <Duktape/Bindings/Context.inl>
+#include <duktape-cpp/Context.inl>
 
-#include <Duktape/Bindings/Types/All.h>
-#include <Duktape/Bindings/PushObjectInspector.inl>
+#include <duktape-cpp/Types/All.h>
+#include <duktape-cpp/PushObjectInspector.inl>
 
 #include "TestTypes.h"
 

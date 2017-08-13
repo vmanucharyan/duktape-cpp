@@ -5,12 +5,12 @@
 
 #include <duktape.h>
 
-#include <Duktape/Bindings/Utils/ClassInfo.h>
+#include <duktape-cpp/Utils/ClassInfo.h>
 
-#include <Duktape/Bindings/Context.inl>
-#include <Duktape/Bindings/Types/All.h>
-#include <Duktape/Bindings/Method.h>
-#include <Duktape/Bindings/PushObjectInspector.inl>
+#include <duktape-cpp/Context.inl>
+#include <duktape-cpp/Types/All.h>
+#include <duktape-cpp/Method.h>
+#include <duktape-cpp/PushObjectInspector.inl>
 
 #include "TestTypes.h"
 

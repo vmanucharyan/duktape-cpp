@@ -3,11 +3,11 @@
 
 #include <string>
 
-#include <Duktape/Bindings/Context.inl>
-#include <Duktape/Bindings/Types/All.h>
-#include <Duktape/Bindings/PushObjectInspector.h>
-#include <Duktape/Bindings/PushObjectInspector.inl>
-#include <Duktape/Bindings/Utils/Inspect.h>
+#include <duktape-cpp/Context.inl>
+#include <duktape-cpp/Types/All.h>
+#include <duktape-cpp/PushObjectInspector.h>
+#include <duktape-cpp/PushObjectInspector.inl>
+#include <duktape-cpp/Utils/Inspect.h>
 
 #include "TestTypes.h"
 

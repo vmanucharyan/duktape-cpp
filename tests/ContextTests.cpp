@@ -1,6 +1,6 @@
 #include <catch/catch.hpp>
 
-#include <Duktape/Bindings/Prelude.h>
+#include <duktape-cpp/DuktapeCpp.h>
 
 namespace ContextTests {
 

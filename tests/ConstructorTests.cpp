@@ -4,7 +4,7 @@
 
 #include <utility>
 
-#include <Duktape/Bindings/Prelude.h>
+#include <duktape-cpp/DuktapeCpp.h>
 
 #include "TestTypes.h"
 
