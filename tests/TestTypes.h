@@ -1,5 +1,8 @@
 #pragma once
 
+#include <duktape.h>
+#include <duktape-cpp/Context.h>
+
 struct Vec2 {
     Vec2() = default;
 
