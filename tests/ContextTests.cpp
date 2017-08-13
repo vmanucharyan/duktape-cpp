@@ -69,15 +69,6 @@ private:
 namespace duk {
 
 template <>
-struct Inspect<ContextTests::TestEnum> {
-    template <class I>
-    static void inspect(I &i) {
-        i.constant("VALUE_1", ContextTests::TestEnum::VALUE_1);
-        i.constant("VALUE_2", ContextTests::TestEnum::VALUE_2);
-    }
-};
-
-template <>
 struct Type<ContextTests::TestEnum> {
     static void push(duk::Context &d, ContextTests::TestEnum const &val) {
         duk_push_int(d, int(val));
@@ -163,26 +154,6 @@ TEST_CASE("Context", "[duktape]") {
 
         SECTION("should evaluate script and return result") {
             REQUIRE(actualResult == expectedResult);
-        }
-
-        SECTION("should not pollute stack") {
-            REQUIRE(duk_get_top(d) == 0);
-        }
-    }
-
-    SECTION("registerEnum") {
-        duk::Context d;
-
-        d.registerEnum<ContextTests::TestEnum>();
-
-        SECTION("should register enum in javascript") {
-            const char testScript[] = "ContextTests.TestEnum.VALUE_1";
-            ContextTests::TestEnum expected = ContextTests::TestEnum::VALUE_1;
-
-            ContextTests::TestEnum actual;
-            d.evalString(actual, testScript);
-
-            REQUIRE(actual == expected);
         }
 
         SECTION("should not pollute stack") {

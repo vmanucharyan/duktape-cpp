@@ -9,8 +9,8 @@ struct Vec2 {
     Vec2(float x, float y) : x(x), y(y) {}
 
     bool operator==(const Vec2 &rhs) const {
-        return x == rhs.x &&
-               y == rhs.y;
+        return fabsf(x - rhs.x) < 1e-6 &&
+               fabsf(y - rhs.y) < 1e-6;
     }
 
     bool operator!=(const Vec2 &rhs) const {

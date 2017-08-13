@@ -15,8 +15,14 @@
 
 namespace duk {
 
+static void fatal_handler(void *udata, const char *msg) {
+    fprintf(stderr, "*** FATAL ERROR: %s\n", (msg ? msg : "no message"));
+    fflush(stderr);
+    throw DuktapeException(msg);
+}
+
 inline Context::Context(std::string const &scriptId) : _ctx(nullptr), _scriptId(scriptId) {
-    _ctx = duk_create_heap_default();
+    _ctx = duk_create_heap(NULL, NULL, NULL, this, fatal_handler);
     assignSelf();
 }
 
@@ -91,7 +97,9 @@ inline void Context::evalStringNoRes(const char *str) {
 }
 
 inline void Context::rethrowDukError() {
-    throw ScriptEvaluationExcepton(duk_safe_to_string(_ctx, -1));
+    printf("%d\n", duk_get_top(_ctx));
+    const char *errorMessage = duk_safe_to_string(_ctx, -1);
+    throw ScriptEvaluationExcepton(std::string(errorMessage));
 }
 
 inline Context& Context::GetSelfFromContext(duk_context *d) {
@@ -211,19 +219,18 @@ private:
 }
 
 template <class T>
-inline void Context::registerEnum() {
+inline void Context::getGlobal(const char *name, T &res) {
     duk_push_global_object(_ctx);
+    duk_get_prop_string(_ctx, -1, name);
 
-    auto namespaces = splitNamespaces(std::string(GetClassName<T>()));
-    int depth = defNamespaces(namespaces);
+    if (duk_is_undefined(_ctx, -1)) {
+        duk_pop_2(_ctx);
+        throw KeyError(std::string(name) + " is undefined");
+    }
 
-    int objIdx = duk_push_object(_ctx);
-    details::ConstantsInspector i(*this, objIdx);
-    Inspect<T>::inspect(i);
-    duk_put_prop_string(_ctx, -2, namespaces.back().c_str());
-    duk_pop(_ctx); // enum object
+    Type<T>::get(*this, res, -1);
 
-    duk_pop_n(_ctx, depth); // namespaces
+    duk_pop_2(_ctx);
 }
 
 }

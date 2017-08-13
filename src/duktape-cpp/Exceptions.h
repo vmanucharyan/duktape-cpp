@@ -14,4 +14,10 @@ public:
         : DuktapeException(what) {}
 };
 
+class KeyError: public DuktapeException {
+public:
+    explicit KeyError(const std::string &what)
+        : DuktapeException(what) {}
+};
+
 }

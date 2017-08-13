@@ -13,13 +13,14 @@ set(source_files ./main.cpp
     ./PushObjectInspectorTests.cpp
     ./SharedPtrTests.cpp
     ./STLTypesTests.cpp
+    ./TuplesTest.cpp
 )
 
 add_executable(${projname} ${source_files} ${header_files})
 add_test(${projname} ${projname})
 
 # duktape
-include_directories(${duktape_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR}/dependencies/duktape)
 target_link_libraries(${projname} duktape)
 
 # catch

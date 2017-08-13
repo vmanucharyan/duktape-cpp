@@ -82,13 +82,6 @@ public:
     void registerClass();
 
     /**
-     * @brief Register enum to this context
-     * @tparam T class type
-     */
-    template <typename T>
-    void registerEnum();
-
-    /**
      * @brief Evaluate string and get result
      * @tparam T result type
      * @param[out] res result
@@ -126,6 +119,15 @@ public:
      * @param stored object key (see return value of stashRef)
      */
     void getRef(int key);
+
+    /**
+     * Get global variable
+     * @tparam T global variable type
+     * @param[in] name global variable name
+     * @param[out] res result
+     */
+    template <class T>
+    void getGlobal(const char *name, T &res);
 
 private:
     duk_context *_ctx;

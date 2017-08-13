@@ -26,6 +26,8 @@ inline void Type<T>::get(duk::Context &d, T &value, int objIdx) {
     T *obj = reinterpret_cast<T*>(duk_get_pointer(d, -1));
     duk_pop(d);
 
+    assert(obj);
+
     value = *obj;
 }
 
