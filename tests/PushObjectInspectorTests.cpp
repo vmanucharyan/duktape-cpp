@@ -14,6 +14,7 @@
 using namespace duk;
 
 namespace PushObjectInspectorTests {
+
 class Player {
 public:
     Player(): _id(-1), _health(-1) {}

@@ -15,7 +15,8 @@ public:
     int pos() const { return _pos; }
 
     /**
-     * You can define `inspect` method or specialize `duk::Inspect` for your class
+     * Inspect method defines class meta information (methods, properties etc..)
+     * You can define `inspect` method inline or specialize `duk::Inspect` for your class
      */
     template <class Inspector>
     static void inspect(Inspector &i) {
@@ -31,7 +32,7 @@ private:
 
 }
 
-DEF_CLASS_NAME(SpaceInvaders::Spaceship);
+DUK_CPP_DEF_CLASS_NAME(SpaceInvaders::Spaceship);
 
 int main(int argc, char **argv) {
     try {

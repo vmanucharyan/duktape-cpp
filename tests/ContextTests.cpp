@@ -81,8 +81,8 @@ struct Type<ContextTests::TestEnum> {
 
 }
 
-DEF_CLASS_NAME(ContextTests::Player);
-DEF_CLASS_NAME(ContextTests::TestEnum);
+DUK_CPP_DEF_CLASS_NAME(ContextTests::Player);
+DUK_CPP_DEF_CLASS_NAME(ContextTests::TestEnum);
 
 TEST_CASE("Context", "[duktape]") {
     using namespace ContextTests;

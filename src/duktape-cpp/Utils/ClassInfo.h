@@ -48,7 +48,7 @@ struct IsPolymorphic {
 /**
  * @brief Defines class name.
  */
-#define DEF_CLASS_NAME(T) \
+#define DUK_CPP_DEF_CLASS_NAME(T) \
     namespace duk { \
     template <> \
     struct ClassName<T> { \
@@ -59,7 +59,7 @@ struct IsPolymorphic {
 /**
  * @brief Defines class short name.
  */
-#define DEF_SHORT_NAME(T, shortName) \
+#define DUK_CPP_DEF_SHORT_NAME(T, shortName) \
     namespace duk { \
     template <> \
     struct ShortClassName<T> { \
@@ -67,7 +67,7 @@ struct IsPolymorphic {
         static constexpr auto value = shortName; \
     };}
 
-#define DEF_BASE_CLASS(Type, Base) \
+#define DUK_CPP_DEF_BASE_CLASS(Type, Base) \
     namespace duk { \
     template <> \
     struct BaseClass<Type> { \
@@ -75,7 +75,7 @@ struct IsPolymorphic {
         typedef Base type; \
     };}
 
-#define DEF_POLYMORPHIC(T) \
+#define DUK_CPP_DEF_POLYMORPHIC(T) \
     namespace duk { \
     template <> struct IsPolymorphic<T> { \
         static constexpr bool value() { return true; } \

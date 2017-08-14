@@ -9,7 +9,7 @@ It is work-in-progress and may lack some features you may need, so feel free to 
 - class binding with constructors, methods, constants, and properties (getters and setters)
 - polymorphic types (with only one level of inheritance, e.g. interface + implementation)
 - STL types (`std::vector`, `std::tuple`, `std::string`)
-- `std::shared_ptr` and `std::unique_ptr` smart pointers
+- shared pointers
 - wrapping JS function into `std::function`
 - custom data types
 
@@ -54,7 +54,7 @@ private:
 
 }
 
-DEF_CLASS_NAME(SpaceInvaders::Spaceship);
+DUK_CPP_DEF_CLASS_NAME(SpaceInvaders::Spaceship);
 
 int main(int argc, char **argv) {
     try {
@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
          * Register class.
          * Make sure the following requirements are met:
          * - Either `inspect` method or `Inspect` template specialization must be defined
-         * - Class name must be defined (via DEF_CLASS_NAME macro)
+         * - Class name must be defined (via DUK_CPP_DEF_CLASS_NAME macro)
          */
         ctx.registerClass<SpaceInvaders::Spaceship>();
 

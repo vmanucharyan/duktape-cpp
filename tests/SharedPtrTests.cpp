@@ -90,7 +90,7 @@ private:
 
 }
 
-DEF_BASE_CLASS(SharedPtrTests::Concrete, SharedPtrTests::Base);
+DUK_CPP_DEF_BASE_CLASS(SharedPtrTests::Concrete, SharedPtrTests::Base);
 
 TEST_CASE("Shared pointer type tests", "[duktape]") {
     using namespace SharedPtrTests;

@@ -23,16 +23,13 @@ public:
     virtual ~ITest2() {}
 
     virtual Vec2 someMethod(float number, Vec3 vector) {
-        return _v;
+        return Vec2(-6, 2);
     }
 
     template <class I>
     static void inspect(I &i) {
         i.method("someMethod", &ITest2::someMethod);
     }
-
-private:
-    Vec2 _v { -6, 2 };
 };
 
 
@@ -40,7 +37,7 @@ class Test2: public ITest2 {
 public:
     template <class I>
     static void inspect(I &i) {
-        i.method("someMethod", &ITest2::someMethod);
+        // i.method("someMethod", &ITest2::someMethod);
     }
 };
 
@@ -62,12 +59,12 @@ public:
 };
 }
 
-DEF_CLASS_NAME(MethodTests::ITest2);
+DUK_CPP_DEF_CLASS_NAME(MethodTests::ITest2);
 
-DEF_CLASS_NAME(MethodTests::Test2);
-DEF_BASE_CLASS(MethodTests::Test2, MethodTests::ITest2);
+DUK_CPP_DEF_CLASS_NAME(MethodTests::Test2);
+DUK_CPP_DEF_BASE_CLASS(MethodTests::Test2, MethodTests::ITest2);
 
-DEF_CLASS_NAME(MethodTests::ITest);
+DUK_CPP_DEF_CLASS_NAME(MethodTests::ITest);
 
 
 template <class C, class R, class ... A>

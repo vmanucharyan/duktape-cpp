@@ -14,6 +14,7 @@ set(source_files ./main.cpp
     ./SharedPtrTests.cpp
     ./STLTypesTests.cpp
     ./TuplesTest.cpp
+    ./PolymorphicTypesTests.cpp
 )
 
 add_executable(${projname} ${source_files} ${header_files})
