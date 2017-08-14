@@ -28,8 +28,10 @@ constexpr auto GetClassName() {
 template <class T>
 struct BaseClass {
     static constexpr bool isDefined() { return false; }
-    typedef void type;
+    using type = void;
 };
+
+template <class T> using BaseOf = typename BaseClass<T>::type;
 
 template <class T>
 class TypeName {
@@ -72,7 +74,7 @@ struct IsPolymorphic {
     template <> \
     struct BaseClass<Type> { \
         static constexpr bool isDefined() { return true; } \
-        typedef Base type; \
+        using type = Base; \
     };}
 
 #define DUK_CPP_DEF_POLYMORPHIC(T) \

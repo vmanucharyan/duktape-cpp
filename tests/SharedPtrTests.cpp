@@ -122,8 +122,7 @@ TEST_CASE("Shared pointer type tests", "[duktape]") {
     }
 
     SECTION("should get shared pointer of inspectable object from stack") {
-        const char script[] =
-            "player";
+        const char script[] = "player";
 
         auto player = std::make_shared<Player>(14, 87, Vec3(54, 12, 43));
         ctx.addGlobal("player", player);

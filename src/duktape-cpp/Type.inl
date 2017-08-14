@@ -1,5 +1,7 @@
 #include "Type.h"
 
+#include <cassert>
+
 #include <duktape.h>
 
 #include <duktape-cpp/PushObjectInspector.h>

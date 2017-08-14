@@ -50,6 +50,8 @@ struct SptrBox<T, false> {
 
 }
 
+
+
 template <class T>
 struct Type<std::shared_ptr<T>> {
     static duk_ret_t finalizer(duk_context *d) {
