@@ -304,7 +304,7 @@ As you can see, it is simply a converter to/from javascript native type.
 `get` method defines how to get value from stack 
 (`index` variable defines objects position in stack)
 
-Please, refer to [duktape](http://duktape.org/index.html) documentation for  
+Please, refer to [duktape](http://duktape.org/index.html) documentation for
 details about stack manipulation.
 
 `static constexpr bool isPrimitive() { return true; }` indicates, that this
@@ -314,12 +314,12 @@ by value.
 ## Polymorphic classes
 
 `duktape-cpp` supports polymorphic types, but currently with only
-one level of inheritance (e.g. interface + implementation).
+one level of inheritance (e.g. interface and implementation).
 
 Use `DUK_CPP_DEF_BASE_CLASS(type, base)` macro to define a base class.
 
 After that, methods and properties of base class will be automatically
-exposed in javascript (not, that base class also need to have `inspect` method
+exposed in javascript (note, that base class also need to have `inspect` method
 or specialize `Inspect` template).
 
 see `tests/PolymorphicTypesTests.cpp` for an example.
