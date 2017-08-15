@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/vmanucharyan/duktape-cpp.svg?branch=master)](https://travis-ci.org/vmanucharyan/duktape-cpp)
+
 # Summary
 
 `duktape-cpp` is a library to easily bind C++ classes to [duktape](http://duktape.org) 
