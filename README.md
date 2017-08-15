@@ -322,12 +322,12 @@ After that, methods and properties of base class will be automatically
 exposed in javascript (note, that base class also need to have `inspect` method
 or specialize `Inspect` template).
 
-see [tests/PolymorphicTypesTests.cpp](tests/PolymorphicTypesTests.cpp) for an example.
+See [tests/PolymorphicTypesTests.cpp](tests/PolymorphicTypesTests.cpp) for an example.
 
 # How to build tests and examples
 
 ```
-git clone ...
+git clone https://github.com/vmanucharyan/duktape-cpp.git
 cd duktape-cpp
 mkdir build && cd build
 cmake ..
