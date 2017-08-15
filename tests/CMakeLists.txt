@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.11)
 
-set(projname duktape_plus_tests)
+set(projname duktape_cpp_tests)
 
 set(header_files TestTypes.h)
 
