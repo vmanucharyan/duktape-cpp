@@ -171,7 +171,7 @@ inline void Context::addGlobal(const char *name, T &&val) {
 
 template <class T>
 inline void Context::push(T &&val) {
-   Type<typename std::decay<T>::type>::push(*this, std::forward<T>(val));
+   Type<ClearType<T>>::push(*this, std::forward<T>(val));
 }
 
 template <class T>
