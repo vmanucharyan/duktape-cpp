@@ -322,7 +322,7 @@ After that, methods and properties of base class will be automatically
 exposed in javascript (note, that base class also need to have `inspect` method
 or specialize `Inspect` template).
 
-see `tests/PolymorphicTypesTests.cpp` for an example.
+see [tests/PolymorphicTypesTests.cpp](tests/PolymorphicTypesTests.cpp) for an example.
 
 # How to build tests and examples
 
