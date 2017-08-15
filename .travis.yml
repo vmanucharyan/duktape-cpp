@@ -5,15 +5,21 @@ matrix:
       addons:
         apt:
           sources:
-          - ubuntu-toolchain-r-test
+            - ubuntu-toolchain-r-test
           packages:
-          - g++-6
-          env:
-            - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
-    - compiler: clang
-      os: osx
-      osx_image: xcode8
+            - g++-6
+      env:
+        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
 
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-3.9
+          packages:
+            - clang-3.9
+      env:
+        - MATRIX_EVAL="CC=clang-3.9 && CXX=clang++-3.9"
 
 before_install:
   - eval "${MATRIX_EVAL}"
