@@ -1,7 +1,7 @@
 # Summary
 
 `duktape-cpp` is a library to easily bind C++ classes to [duktape](http://duktape.org) 
-scripts. It is aimed to be easy to use and safe.
+scripts. It aims to be easy to use and safe.
 
 It is currently work-in-progress and may lack some features, so feel free to to contribute!
 
