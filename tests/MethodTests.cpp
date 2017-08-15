@@ -57,6 +57,7 @@ public:
     virtual std::shared_ptr<ITest2> returnSharedPtr() = 0;
     virtual void sharedPtrArg(std::shared_ptr<ITest2> const &test2) const = 0;
 };
+
 }
 
 DUK_CPP_DEF_CLASS_NAME(MethodTests::ITest2);
@@ -234,8 +235,8 @@ TEST_CASE("Method bindings tests", "[duktape]") {
             REQUIRE(evalRes == 0);
 
             bool isCalled = Verify(Method(mock, sharedPtrArg)).Exactly(Once);
-            REQUIRE(isCalled == true);
-            REQUIRE(argsMatched == true);
+            REQUIRE(isCalled);
+            REQUIRE(argsMatched);
         }
     }
 

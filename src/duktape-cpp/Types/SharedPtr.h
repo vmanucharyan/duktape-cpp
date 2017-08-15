@@ -109,6 +109,8 @@ struct Type<std::shared_ptr<T>> {
         auto const &box = d.getBox(key);
         details::SptrBox<T, BaseClass<T>::isDefined()>::assign(box, value);
     }
+
+    static constexpr bool isPrimitive() { return true; };
 };
 
 }

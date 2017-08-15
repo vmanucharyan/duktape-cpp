@@ -17,6 +17,8 @@ struct Type<std::string> {
         const char *cstr = duk_get_string(d, index);
         value = std::string(cstr);
     }
+
+    static constexpr bool isPrimitive() { return true; };
 };
 
 template <class T>
@@ -41,6 +43,8 @@ struct Type<std::vector<T>> {
 
         duk_pop(d);
     }
+
+    static constexpr bool isPrimitive() { return true; };
 };
 
 }

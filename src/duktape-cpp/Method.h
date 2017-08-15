@@ -13,12 +13,57 @@
 
 namespace duk { namespace details {
 
+template <class A, int Index, bool IsPrimitive>
+struct ArgGetter {
+    static A get(duk::Context &d);
+};
+
 template <class A, int Index>
-ClearType<A> GetArg(duk::Context &d) {
-    ClearType<A> instance;
-    Type<ClearType<A>>::get(d, instance, Index);
-    return instance;
-}
+struct ArgGetter<A, Index, true> {
+    static ClearType<A> get(duk::Context &d) {
+        ClearType<A> instance;
+        Type<ClearType<A>>::get(d, instance, Index);
+        return instance;
+    }
+};
+
+// object passed by value is copied
+template <class A, int Index>
+struct ArgGetter<A, Index, false> {
+    static ClearType<A> get(duk::Context &d) {
+        return ArgGetter<A, Index, true>::get(d);
+    }
+};
+
+// reference to primitive type
+template <class A, int Index>
+struct ArgGetter<A const &, Index, true> {
+    static A get(duk::Context &d) {
+        // primitive types are copied from context
+        return ArgGetter<ClearType<A>, Index, true>::get(d);
+    }
+};
+
+// reference to object
+template <class A, int Index>
+struct ArgGetter<A&, Index, false> {
+    static A& get(duk::Context &d) {
+        if (!duk_has_prop_string(d, Index, "\xff" "obj_ptr")) {
+            duk_error(d, DUK_ERR_TYPE_ERROR, "Expected reference to object, but `obj_ptr` not defined");
+        }
+        duk_get_prop_string(d, Index, "\xff" "obj_ptr");
+        A *obj = reinterpret_cast<A*>(duk_get_pointer(d, -1));
+        duk_pop(d);
+        return *obj;
+    }
+};
+
+template <class A, int Index>
+struct ArgGetter<A const &, Index, false> {
+    static A const & get(duk::Context &d) {
+        return ArgGetter<A&, Index, false>::get(d);
+    }
+};
 
 /**
  * Method dispatcher used to call native method and push result to duktape stack
@@ -33,7 +78,7 @@ struct MethodDispatcher {
 
     template<std::size_t ... I>
     R call(std::function<R(C*, A...)> const &func, C* obj, duk::Context &d, std::index_sequence<I...>) {
-        return func(obj, GetArg<A, I>(d)...);
+        return func(obj, ArgGetter<A, I, Type<ClearType<A>>::isPrimitive()>::get(d)...);
     }
 };
 
@@ -46,7 +91,7 @@ struct MethodDispatcher<C, void, A...> {
 
     template<std::size_t ...I>
     void call(std::function<void(C*, A...)> const &func, C* obj, duk::Context &d, std::index_sequence<I...>) {
-        func(obj, GetArg<A, I>(d)...);
+        func(obj, ArgGetter<A, I, Type<ClearType<A>>::isPrimitive()>::get(d)...);
     }
 };
 

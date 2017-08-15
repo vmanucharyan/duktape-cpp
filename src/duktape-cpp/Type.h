@@ -26,6 +26,11 @@ struct Type {
      * @param[out] val value
      */
     static void get(duk::Context &d, T &val, int index);
+
+    /**
+     * Indicates if type is primitive
+     */
+    static constexpr bool isPrimitive() { return false; };
 };
 
 }

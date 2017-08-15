@@ -66,7 +66,7 @@ public:
     void removeBox(int key);
 
     /**
-     * @brief Add global value to this context (value must have `inspect` method)
+     * @brief Add global value to this context
      * @tparam T value type
      * @param name name of the value (must be valid variable name for javascript)
      * @param val value

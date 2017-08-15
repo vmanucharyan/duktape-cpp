@@ -17,6 +17,9 @@ struct Type<std::tuple<A...>> {
         duk_pop(d);
     }
 
+    static constexpr bool isPrimitive() { return true; };
+
+private:
     template <int idx, typename AA, typename BB, typename ... CC>
     static void getElement(duk::Context &d, std::tuple<A...> &val) {
         getElement<idx, AA>(d, val);

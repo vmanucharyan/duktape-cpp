@@ -12,11 +12,14 @@ public:
     virtual std::string overriddenMethod() { return "base"; }
     int nonVirtualMethod() { return 100; }
 
+    int refToBaseClassArg(IBase &base) { return base.pureVirtualMethod(); }
+
     template <class Inspector>
     static void inspect(Inspector &i) {
         i.method("pureVirtualMethod", &IBase::pureVirtualMethod);
         i.method("overriddenMethod", &IBase::overriddenMethod);
         i.method("nonVirtualMethod", &IBase::nonVirtualMethod);
+        i.method("refToBaseClassArg", &IBase::refToBaseClassArg);
     }
 };
 
@@ -40,10 +43,20 @@ public:
         _someProp = someProp;
     }
 
+    void refToConcreteClassArg(Concrete &other) {
+        other.setSomeProp(this->someProp());
+    }
+
+    int ptToBaseClassArg(std::shared_ptr<IBase> other) {
+        return other->pureVirtualMethod();
+    }
+
     template <class Inspector>
     static void inspect(Inspector &i) {
         i.construct(&std::make_shared<Concrete, int>);
         i.property("someProp", &Concrete::someProp, &Concrete::setSomeProp);
+        i.method("refToConcreteClassArg", &Concrete::refToConcreteClassArg);
+        i.method("ptToBaseClassArg", &Concrete::ptToBaseClassArg);
     }
 
 private:
@@ -103,6 +116,29 @@ TEST_CASE("Polymorphic classes", "[duktape-cpp]") {
             ctx.evalString(res, "obj.pureVirtualMethod()");
 
             REQUIRE(res == 1233);
+        }
+
+        SECTION("call method that accepts reference to base class") {
+            int res = -1;
+            ctx.evalString(res,
+                "var a = new PolymorphicTests.Concrete(123);\n"
+                "var b = new PolymorphicTests.Concrete(456);\n"
+                "b.refToBaseClassArg(a)"
+            );
+
+            REQUIRE(res == 123);
+        }
+
+        SECTION("call method that accepts reference to concrete class") {
+            int res = -1;
+            ctx.evalString(res,
+                "var a = new PolymorphicTests.Concrete(123);\n"
+                "var b = new PolymorphicTests.Concrete(456);\n"
+                "b.refToConcreteClassArg(a);\n"
+                "a.someProp"
+            );
+
+            REQUIRE(res == 456);
         }
     }
 }

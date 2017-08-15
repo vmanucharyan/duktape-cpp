@@ -125,6 +125,8 @@ struct Type<std::unique_ptr<T>> {
 
         details::MakeUptrBox<T, BaseClass<T>::isDefined()>::assign(box, value);
     }
+
+    static constexpr bool isPrimitive() { return true; };
 };
 
 }

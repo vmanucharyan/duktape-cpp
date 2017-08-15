@@ -11,6 +11,8 @@ struct Type<int> {
     static void get(duk::Context &d, int &val, int index) {
         val = duk_require_int(d, index);
     }
+
+    static constexpr bool isPrimitive() { return true; };
 };
 
 template <>
@@ -22,6 +24,8 @@ struct Type<float> {
     static void get(duk::Context &d, float &val, int index) {
         val = float(duk_require_number(d, index));
     }
+
+    static constexpr bool isPrimitive() { return true; };
 };
 
 template <>
@@ -33,6 +37,8 @@ struct Type<double> {
     static void get(duk::Context &d, double &val, int index) {
         val = double(duk_require_number(d, index));
     }
+
+    static constexpr bool isPrimitive() { return true; };
 };
 
 template <>
@@ -44,6 +50,8 @@ struct Type<bool> {
     static void get(duk::Context &d, bool &val, int index) {
         val = bool(duk_require_boolean(d, index));
     }
+
+    static constexpr bool isPrimitive() { return true; };
 };
 
 }

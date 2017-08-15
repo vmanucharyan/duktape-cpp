@@ -46,6 +46,8 @@ struct Type<Vec2> {
 
         val = Vec2(x, y);
     }
+
+    static constexpr bool isPrimitive() { return true; }
 };
 
 }
@@ -102,6 +104,8 @@ struct Type<Vec3> {
 
         val = Vec3(x, y, z);
     }
+
+    static constexpr bool isPrimitive() { return true; }
 };
 
 }
