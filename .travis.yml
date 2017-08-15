@@ -1,0 +1,30 @@
+language: cpp
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          packages:
+          - g++-6
+          env:
+            - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+    - compiler: clang
+      os: osx
+      osx_image: xcode8
+
+
+before_install:
+  - eval "${MATRIX_EVAL}"
+
+script:
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - ./tests/duktape_cpp_tests
+
+branches:
+  only:
+    - master
