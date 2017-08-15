@@ -1,13 +1,17 @@
 # Summary
 
-`duktape-cpp` is a library to easily bind C++ classes to duktape scripts.
+`duktape-cpp` is a library to easily bind C++ classes 
+to [duktape](http://duktape.org) scripts. It is aimed to be easy to use and safe.
 
-It is work-in-progress and may lack some features you may need, so feel free to contribute!
+It is currently work-in-progress and may lack some features, so feel free to to contribute!
 
 # Getting started
 
+Requirements:
+- Modern C++ compiler with C++14 support
+
 duktape-cpp is a header-only library, so all you need is to just add source
-files from `src` directory to you project and `#include "duktape-cpp/DuktapeCpp.h"`
+files from `src` directory to you project and `#include "duktape-cpp/DuktapeCpp.h"`.
 
 # Basic example
 
@@ -68,7 +72,7 @@ int main(int argc, char **argv) {
         ctx.evalStringNoRes("var spaceship = new SpaceInvaders.Spaceship(5)");
 
         /**
-         * Get shared pointer to spaceship
+         * Get pointer to spaceship
          */
         std::shared_ptr<SpaceInvaders::Spaceship> spaceship;
         ctx.getGlobal("spaceship", spaceship);
@@ -161,27 +165,27 @@ Note, that specialization must be in `duk` namespace
 
 Then, we need to specify class name. We can do it with `DUK_CPP_DEF_CLASS_NAME` macro
 
-```
+```cpp
 DUK_CPP_DEF_CLASS_NAME(SpaceInvaders::Spaceship)
 ```
 
 Full name will be translated into `SpaceInvaders.Spaceship`.
 
-We can specify another, shorter name by using `DUK_CPP_SEF_SHORT_NAME` macro
+We can specify another (shorter) name by using `DUK_CPP_SEF_SHORT_NAME` macro
 
-```
+```cpp
 DUK_CPP_DEF_CLASS_NAME(SpaceInvaders::Spaceship, "Spaceship")
 ```
 
 ## Constructors
 
 If we want to be able to create a spaceship from javascript code,
-we have to define a constructor:
+we have to define a constructor like this:
 
-```
+```cpp
 template <class Inspector>
 static void inspect(Inspector &i) {
-    i.construct(&std::make_shared<SpaceInvaders::Spaceship>);
+    i.construct(&std::make_shared<SpaceInvaders::Spaceship, int>);
 }
 ```
 
@@ -195,34 +199,139 @@ pointer to our class.
 After we defined `inspect` method and class name, we can register class
 in duktape context;
 
-```
+```cpp
 ctx.registerClass<SpaceInvaders::Spaceship>();
 ```
 
 ## Evaluating script
 
+There are two wrapper methods in `duk::Context` to evaluate script - 
+`evaluateScript` and `evaluateScriptNoRes`. 
+
+```cpp
+std::shared_ptr<Spaceship> res;
+ctx.evalString(res, "new SpaceInvaders.Spaceship(5)");
 ```
+
+```cpp
 ctx.evalStringNoRes("var spaceship = new SpaceInvaders.Spaceship(5)");
 ```
 
-## Add global object
+## Pass objects to script
 
-```
+To pass object to duktape context use `duk::Context::addGlobal` method.
+
+```cpp
 duk::Context ctx;
-ctx.addGlobal<MyClass>();
+
+auto spaceship = std::make_shared<Spaceship>();
+ctx.addGlobal("spaceship", spaceship);
 ```
 
-## Custom data types
+Now we can access spaceship's methods and properties from script.
+
+```cpp
+ctx.evalStringNoRes("spaceship.moveRight()");
+assert(spaceship->pos() == 6);
+```
+
+## Custom value types
+
+Built-in value types:
+- int, double, float, bool
+- std::string
+- std::shared_ptr
+- std::unique_ptr
+- std::vector
+- std::tuple
+
+You can define your own data type by specializing `duk::Type` template. 
+Here is an example:
+
+```cpp
+struct Vec3 {
+    Vec3() = default;
+    Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
+
+    float x {0.0f};
+    float y {0.0f};
+    float z {0.0f};
+};
+
+namespace duk {
+
+template <>
+struct Type<Vec3> {
+    static void push(duk::Context &d, Vec3 const &val) {
+        duk_push_object(d);
+
+        duk_push_number(d, val.x);
+        duk_put_prop_string(d, -2, "x");
+
+        duk_push_number(d, val.y);
+        duk_put_prop_string(d, -2, "y");
+
+        duk_push_number(d, val.z);
+        duk_put_prop_string(d, -2, "z");
+    }
+
+    static void get(duk::Context &d, Vec3 &val, int index) {
+        duk_get_prop_string(d, index, "x");
+        float x = float(duk_get_number(d, -1));
+        duk_pop(d);
+
+        duk_get_prop_string(d, index, "y");
+        float y = float(duk_get_number(d, -1));
+        duk_pop(d);
+
+        duk_get_prop_string(d, index, "z");
+        float z = float(duk_get_number(d, -1));
+        duk_pop(d);
+
+        val = Vec3(x, y, z);
+    }
+
+    static constexpr bool isPrimitive() { return true; }
+};
+
+}
+```
+
+As you can see, it is simply a converter to/from javascript native type.
+
+`push` method defines how to push value to duktape's stack
+
+`get` method defines how to get value from stack 
+(`index` variable defines objects position in stack)
+
+Please, refer to [duktape](http://duktape.org/index.html) documentation for  
+details about stack manipulation.
+
+`static constexpr bool isPrimitive() { return true; }` indicates, that this
+type is primitive. Primitive types are always passed to/from duktape context
+by value.
 
 ## Polymorphic classes
 
-# What is supported (Roadmap)
+`duktape-cpp` supports polymorphic types, but currently with only
+one level of inheritance (e.g. interface + implementation).
 
-- class binding with constructors, methods, constants, and properties (getters and setters)
-- polymorphic types (with only one level of inheritance, e.g. interface + implementation)
-- STL types (`std::vector`, `std::tuple`, `std::string`)
-- shared pointers
-- wrapping JS function into `std::function`
-- custom data types
+Use `DUK_CPP_DEF_BASE_CLASS(type, base)` macro to define a base class.
+
+After that, methods and properties of base class will be automatically
+exposed in javascript (not, that base class also need to have `inspect` method
+or specialize `Inspect` template).
+
+see `tests/PolymorphicTypesTests.cpp` for an example.
+
+# How to build tests and examples
+
+```
+git clone ...
+cd duktape-cpp
+mkdir build && cd build
+cmake ..
+make
+```
 
 # License
