@@ -114,7 +114,7 @@ It is basically a wrapper around `duk_context`.
 ## Defining inspectors
 
 First, we need to tell `duktape-cpp` which members of class need to be exposed.
-This can be done by defining `inspect` method inside of out class.
+This can be done by defining `inspect` method inside of our class.
 
 ```cpp
 namespace SpaceInvaders {
