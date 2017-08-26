@@ -173,10 +173,10 @@ DUK_CPP_DEF_CLASS_NAME(SpaceInvaders::Spaceship)
 
 Full name will be translated into `SpaceInvaders.Spaceship`.
 
-We can specify another (shorter) name by using `DUK_CPP_SEF_SHORT_NAME` macro
+We can specify another (shorter) name by using `DUK_CPP_DEF_SHORT_NAME` macro
 
 ```cpp
-DUK_CPP_DEF_CLASS_NAME(SpaceInvaders::Spaceship, "Spaceship")
+DUK_CPP_DEF_SHORT_NAME(SpaceInvaders::Spaceship, "Spaceship")
 ```
 
 ## Constructors
