@@ -46,6 +46,11 @@ inline void Constructor<C, A...>::push(duk::Context &d, std::shared_ptr<C> (*con
 
 template <class C, class ... A>
 inline duk_ret_t Constructor<C, A...>::func(duk_context *d) {
+   if (!duk_is_constructor_call(d)) {
+      duk_error(d, DUK_RET_TYPE_ERROR, "Constructor must be called with 'new'.");
+      return DUK_RET_TYPE_ERROR;
+   }
+    
    duk_push_global_stash(d);
    duk_get_prop_string(d, -1, "self_ptr");
    duk::Context *ctx = reinterpret_cast<duk::Context*>(duk_get_pointer(d, -1));
@@ -99,6 +104,11 @@ inline void ConstructorUnique<C, A...>::push(duk::Context &d, std::unique_ptr<C>
 
 template <class C, class ... A>
 inline duk_ret_t ConstructorUnique<C, A...>::func(duk_context *d) {
+   if (!duk_is_constructor_call(d)) {
+      duk_error(d, DUK_RET_TYPE_ERROR, "Constructor must be called with 'new'.");
+      return DUK_RET_TYPE_ERROR;
+   }
+    
    duk_push_global_stash(d);
    duk_get_prop_string(d, -1, "self_ptr");
    duk::Context *ctx = reinterpret_cast<duk::Context*>(duk_get_pointer(d, -1));
