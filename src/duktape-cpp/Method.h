@@ -246,8 +246,6 @@ struct StaticMethod {
 
     static int pushMethod(duk::Context &d, MethodPointer method) {
         // Store method pointer
-		printf("Push static\n");
-
         auto *mh = new MethodPointer(method);
 
         // Push function into stack
