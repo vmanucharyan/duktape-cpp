@@ -14,6 +14,19 @@ struct Type<int> {
 
     static constexpr bool isPrimitive() { return true; };
 };
+    
+template <>
+struct Type<unsigned int> {
+    static void push(duk::Context &d, unsigned int val) {
+        duk_push_uint(d, val);
+    }
+
+    static void get(duk::Context &d, unsigned int &val, int index) {
+        val = duk_require_uint(d, index);
+    }
+
+    static constexpr bool isPrimitive() { return true; };
+};
 
 template <>
 struct Type<float> {
