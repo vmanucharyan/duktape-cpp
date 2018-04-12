@@ -148,12 +148,12 @@ TEST_CASE("PushConstructorInspector", "[duktape]") {
 
         duk_push_global_object(d);
 
-        duk::details::PushConstructorInspector i(d);
-
-        SimpleConstructible().inspect(i);
+        duk::details::PushConstructorInspector simpleInspector(d);
+        SimpleConstructible().inspect(simpleInspector);
         duk_put_prop_string(d, -2, "SimpleConstructible");
 
-        ComplexConstructible().inspect(i);
+        duk::details::PushConstructorInspector complexInspector(d);
+        ComplexConstructible().inspect(complexInspector);
         duk_put_prop_string(d, -2, "ComplexConstructible");
 
         auto evalRes = duk_peval_string(d, script);

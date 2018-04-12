@@ -14,16 +14,23 @@ public:
 
     template <class C, class ... A>
     void construct(std::shared_ptr<C> (*constructor) (A...)) {
-        Constructor<C, A...>::push(_ctx, constructor);
+        if (!_hasConstructor) {
+            _hasConstructor = true;
+            Constructor<C, A...>::push(_ctx, constructor);
+        }
     }
 
     template <class C, class ... A>
     void construct(std::unique_ptr<C> (*constructor) (A...)) {
-        ConstructorUnique<C, A...>::push(_ctx, constructor);
+        if (!_hasConstructor) {
+            _hasConstructor = true;
+            ConstructorUnique<C, A...>::push(_ctx, constructor);
+        }
     }
 
 private:
     duk::Context &_ctx;
+    bool _hasConstructor = false;
 };
 
 }}
