@@ -167,6 +167,9 @@ struct Type<std::function<R(A...)>> {
         };
         val = std::move(fn);
     }
+
+    static constexpr bool isPrimitive() { return true; };
+
 };
 
 }
