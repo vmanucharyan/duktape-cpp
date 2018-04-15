@@ -63,17 +63,32 @@ private:
     int _someProp { 0 };
 };
 
+class SubConcrete: public Concrete {
+public:
+    explicit SubConcrete(int someProp) : Concrete(someProp) {}
+
+    template <class Inspector>
+    static void inspect(Inspector &i) {
+        i.construct(&std::make_shared<SubConcrete, int>);
+    }
+};
+
 }
 
 DUK_CPP_DEF_CLASS_NAME(PolymorphicTests::Concrete);
 DUK_CPP_DEF_BASE_CLASS(PolymorphicTests::Concrete, PolymorphicTests::IBase);
 
+DUK_CPP_DEF_CLASS_NAME(PolymorphicTests::SubConcrete);
+DUK_CPP_DEF_BASE_CLASS(PolymorphicTests::SubConcrete, PolymorphicTests::Concrete);
+
 TEST_CASE("Polymorphic classes", "[duktape-cpp]") {
     using PolymorphicTests::IBase;
     using PolymorphicTests::Concrete;
+    using PolymorphicTests::SubConcrete;
 
     duk::Context ctx;
     ctx.registerClass<Concrete>();
+    ctx.registerClass<SubConcrete>();
 
     SECTION("when created from script") {
         SECTION("should be able to get pointer to base class") {
@@ -134,6 +149,29 @@ TEST_CASE("Polymorphic classes", "[duktape-cpp]") {
             ctx.evalString(res,
                 "var a = new PolymorphicTests.Concrete(123);\n"
                 "var b = new PolymorphicTests.Concrete(456);\n"
+                "b.refToConcreteClassArg(a);\n"
+                "a.someProp"
+            );
+
+            REQUIRE(res == 456);
+        }
+
+        SECTION("call method that accepts reference to subbase class") {
+            int res = -1;
+            ctx.evalString(res,
+                "var a = new PolymorphicTests.SubConcrete(123);\n"
+                "var b = new PolymorphicTests.SubConcrete(456);\n"
+                "b.refToBaseClassArg(a)"
+            );
+
+            REQUIRE(res == 123);
+        }
+
+        SECTION("call method that accepts reference to subconcrete class") {
+            int res = -1;
+            ctx.evalString(res,
+                "var a = new PolymorphicTests.SubConcrete(123);\n"
+                "var b = new PolymorphicTests.SubConcrete(456);\n"
                 "b.refToConcreteClassArg(a);\n"
                 "a.someProp"
             );
