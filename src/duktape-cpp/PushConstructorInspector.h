@@ -28,6 +28,15 @@ public:
         }
     }
 
+    template <class A>
+    void static_property(const char *name, StaticGetter<A> getter, StaticSetter<A> setter);
+
+    template <class A>
+    void static_property(const char *name, StaticGetter<A> getter);
+
+    template <class R, class ... A>
+    void static_method(const char *name, R(*method)(A...));
+
 private:
     duk::Context &_ctx;
     bool _hasConstructor = false;
